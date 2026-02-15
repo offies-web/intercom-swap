@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitnessBuddy - Your AI Personal Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .demo-badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 600;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        .stats-sidebar {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        .profile-section {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .profile-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .profile-goal {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .stat-card h4 {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .progress-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .progress-card h4 {
+            font-size: 0.9em;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.85em;
+            color: #718096;
+            text-align: right;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .mini-stat {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .mini-stat .icon {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .mini-stat .value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .mini-stat .label {
+            font-size: 0.75em;
+            color: #718096;
+            margin-top: 3px;
+        }
+
+        .chat-container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 650px;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #f093fb;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            color: #f5576c;
+            font-weight: 600;
+        }
+
+        .quick-action:hover {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            line-height: 1.4;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+            background: #f7fafc;
+            color: #2d3748;
+            border: 1px solid #e2e8f0;
+        }
+
+        .message.system {
+            align-self: center;
+            background: #fff5f5;
+            color: #c53030;
+            font-size: 0.9em;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .input-area {
+            padding: 20px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-area input:focus {
+            border-color: #f093fb;
+        }
+
+        .input-area button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+
+        .input-area button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .input-area button:active {
+            transform: translateY(0);
+        }
+
+        .input-area button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #f5576c;
+            animation: pulse 1.5s ease-in-out infinite;
+            margin: 0 3px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .workout-card {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+            border-left: 4px solid #f5576c;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+
+        .workout-card strong {
+            color: #f5576c;
+        }
+
+        .meal-card {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+            border-radius: 12px;
+            padding: 10px;
+            margin: 5px 0;
+        }
+
+        .exercise-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(245, 87, 108, 0.15);
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 2px;
+            color: #f5576c;
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-sidebar {
+                order: 2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💪 FitnessBuddy</h1>
+            <p>Your AI Personal Trainer & Nutrition Coach</p>
+            <div class="demo-badge">✨ INTERACTIVE DEMO</div>
+        </div>
+
+        <div class="main-grid">
+            <div class="stats-sidebar">
+                <div class="profile-section">
+                    <div class="profile-avatar">💪</div>
+                    <div class="profile-name">Alex Fitness</div>
+                    <div class="profile-goal">Goal: Build Muscle & Lose Fat</div>
+                </div>
+
+                <div class="stat-card">
+                    <h4>Today's Calories</h4>
+                    <div class="value">1,847</div>
+                    <div class="label">of 2,200 goal</div>
+                </div>
+
+                <div class="progress-card">
+                    <h4>Weekly Workout Goal</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                    <div class="progress-text">3 of 5 workouts complete</div>
+                </div>
+
+                <div class="progress-card">
+                    <h4>Water Intake</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <div class="progress-text">6 of 8 glasses</div>
+                </div>
+
+                <div class="quick-stats">
+                    <div class="mini-stat">
+                        <div class="icon">🔥</div>
+                        <div class="value">524</div>
+                        <div class="label">Calories Burned</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="icon">⏱️</div>
+                        <div class="value">45</div>
+                        <div class="label">Active Minutes</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="icon">🏋️</div>
+                        <div class="value">12.5</div>
+                        <div class="label">Tons Lifted</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="icon">📈</div>
+                        <div class="value">7</div>
+                        <div class="label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <div class="quick-actions">
+                    <button class="quick-action" onclick="sendQuickMessage('Create a workout plan for today')">🏋️ Workout Plan</button>
+                    <button class="quick-action" onclick="sendQuickMessage('What should I eat for lunch?')">🍽️ Meal Ideas</button>
+                    <button class="quick-action" onclick="sendQuickMessage('Log: 30 min cardio, burned 300 calories')">📝 Log Workout</button>
+                    <button class="quick-action" onclick="sendQuickMessage('Show my progress this week')">📊 Progress</button>
+                    <button class="quick-action" onclick="sendQuickMessage('I need motivation!')">💪 Motivate Me</button>
+                </div>
+
+                <div class="messages" id="messages">
+                    <div class="message assistant">
+                        💪 Hey there, champ! I'm FitnessBuddy, your AI personal trainer and nutrition coach.
+                        <br><br>
+                        I can help you:
+                        <br>• Create personalized workout plans
+                        <br>• Design meal plans for your goals
+                        <br>• Track workouts and calories
+                        <br>• Provide form tips and exercise variations
+                        <br>• Keep you motivated and accountable
+                        <br>• Recommend supplements via IntercomSwap
+                        <br><br>
+                        You're on a 7-day streak! Let's crush today's goals! What do you want to work on?
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <input 
+                        type="text" 
+                        id="userInput" 
+                        placeholder="Ask for a workout, meal plan, log exercise, or get motivation..."
+                        onkeypress="if(event.key==='Enter') sendMessage()"
+                    />
+                    <button onclick="sendMessage()" id="sendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userStats = {
+            caloriesGoal: 2200,
+            caloriesConsumed: 1847,
+            workoutsThisWeek: 3,
+            workoutGoal: 5,
+            waterGlasses: 6,
+            waterGoal: 8,
+            streak: 7,
+            activeMinutes: 45,
+            caloriesBurned: 524
+        };
+
+        const responses = {
+            'workout': `🏋️ <strong>Today's Workout Plan: Upper Body Strength</strong>
+
+<div class="workout-card">
+<strong>Warm-up (10 min)</strong>
+• Arm circles: 2x20
+• Band pull-aparts: 2x15
+• Light cardio: 5 min
+</div>
+
+<div class="workout-card">
+<strong>Main Workout</strong>
+<br><br>
+<span class="exercise-badge">Bench Press</span> 4 sets x 8-10 reps
+<br><span class="exercise-badge">Bent-Over Rows</span> 4 sets x 10-12 reps
+<br><span class="exercise-badge">Overhead Press</span> 3 sets x 8-10 reps
+<br><span class="exercise-badge">Pull-ups</span> 3 sets x max reps
+<br><span class="exercise-badge">Dumbbell Curls</span> 3 sets x 12 reps
+<br><span class="exercise-badge">Tricep Dips</span> 3 sets x 12 reps
+</div>
+
+<div class="workout-card">
+<strong>Cool-down (5 min)</strong>
+• Chest stretches
+• Shoulder stretches
+• Deep breathing
+</div>
+
+<strong>Tips:</strong>
+✅ Focus on form over weight
+✅ Rest 90-120 seconds between sets
+✅ Stay hydrated (you're at 6/8 glasses!)
+✅ Track your weights for progressive overload
+
+This should take 45-50 minutes. Ready to crush it? 💪`,
+
+            'meal': `🍽️ <strong>Lunch Ideas for Your Goals</strong>
+
+You've consumed 1,847 calories today (goal: 2,200). Here are balanced lunch options:
+
+<div class="meal-card">
+<strong>Option 1: Grilled Chicken Power Bowl</strong>
+• 6oz grilled chicken breast (280 cal, 54g protein)
+• 1 cup brown rice (215 cal, 5g protein)
+• Mixed vegetables (50 cal)
+• Avocado (80 cal, healthy fats)
+<br><br><strong>Total: ~625 calories | 60g protein</strong>
+</div>
+
+<div class="meal-card">
+<strong>Option 2: Salmon & Sweet Potato</strong>
+• 5oz baked salmon (280 cal, 36g protein)
+• 1 medium sweet potato (180 cal)
+• Steamed broccoli (55 cal)
+• Olive oil drizzle (120 cal)
+<br><br><strong>Total: ~635 calories | 40g protein</strong>
+</div>
+
+<div class="meal-card">
+<strong>Option 3: High-Protein Wrap</strong>
+• Whole wheat wrap (180 cal)
+• 8oz turkey breast (240 cal, 48g protein)
+• Hummus, veggies, Greek yogurt sauce (150 cal)
+<br><br><strong>Total: ~570 calories | 52g protein</strong>
+</div>
+
+<strong>Pro Tips:</strong>
+✅ All options hit 35g+ protein for muscle building
+✅ Leaves room for dinner + snacks (550 cal remaining)
+✅ Balanced macros for energy and recovery
+
+Which sounds good? I can give you the recipe! 🥗`,
+
+            'log': `📝 <strong>Workout Logged Successfully!</strong>
+
+<div class="workout-card">
+<strong>Activity:</strong> 30 minutes cardio
+<br><strong>Calories Burned:</strong> 300 🔥
+<br><strong>Time:</strong> Today, ${new Date().toLocaleTimeString()}
+</div>
+
+<strong>Updated Stats:</strong>
+• Total Calories Burned Today: 824 🔥
+• Active Minutes: 75 ⏱️
+• Workouts This Week: 4 of 5 ✅
+
+<strong>Progress Check:</strong>
+✨ You're 80% to your weekly workout goal!
+✨ One more workout and you'll hit your target!
+✨ Your 7-day streak continues strong! 💪
+
+<strong>Recovery Tips:</strong>
+• Stretch for 5-10 minutes
+• Drink a protein shake (you have room for 350 cal)
+• Get 7-8 hours of sleep tonight
+• Stay hydrated! (Aim for 2 more glasses of water)
+
+Amazing work today! Keep this momentum going! 🚀`,
+
+            'progress': `📊 <strong>Your Weekly Progress Report</strong>
+
+<strong>Workouts Completed:</strong>
+✅ Monday: Chest & Triceps (524 cal burned)
+✅ Tuesday: Back & Biceps (487 cal burned)
+✅ Wednesday: Rest Day
+✅ Thursday: Legs (612 cal burned)
+✅ Today: Cardio (300 cal burned)
+
+<strong>Nutrition Stats:</strong>
+• Average Daily Calories: 2,150 (right on target!)
+• Protein Average: 165g/day 💪
+• Hitting macros: 4 out of 5 days ✅
+
+<strong>Achievements This Week:</strong>
+🏆 7-day consistency streak
+🏆 Increased bench press by 5 lbs
+🏆 Hit step goal 6 out of 7 days
+🏆 Water intake improved by 30%
+
+<strong>Body Metrics:</strong>
+• Weight: -1.2 lbs from last week 📉
+• Measurements: -0.5 inches off waist
+• Energy Levels: ⭐⭐⭐⭐⭐ (reported as "great")
+
+<strong>Next Week's Focus:</strong>
+1. Add one more workout (target: 5/5)
+2. Increase protein to 175g/day
+3. Try progressive overload on main lifts
+4. Get 8 hours of sleep consistently
+
+You're crushing it! Keep up this momentum! 🔥`,
+
+            'motivation': `💪 <strong>Time for Some Real Talk, Champion!</strong>
+
+Look at what you've accomplished:
+✨ <strong>7-day streak</strong> - That's COMMITMENT
+✨ <strong>3 workouts done this week</strong> - You showed up
+✨ <strong>Consistent calorie tracking</strong> - That's discipline
+✨ <strong>Hit your protein goals</strong> - You're fueling success
+
+<strong>Remember Why You Started:</strong>
+You set out to build muscle and lose fat. Every single workout, every healthy meal, every glass of water is a VOTE for the person you're becoming.
+
+<strong>The Truth About Progress:</strong>
+• You don't need to be perfect - you need to be CONSISTENT
+• Every rep counts, even on tired days
+• Rest days are PART of the plan
+• Small wins compound into big transformations
+
+<strong>You're Not Just Working Out...</strong>
+You're building:
+🧠 Mental toughness
+💪 Physical strength
+🎯 Discipline that carries into all areas of life
+❤️ Self-respect through follow-through
+
+<strong>Today's Challenge:</strong>
+Finish that workout. Hit your water goal. Get to bed on time. Tomorrow you'll thank today's you for not giving up.
+
+<strong>YOU. CAN. DO. THIS.</strong> 🔥
+
+Now go show yourself what you're made of! I'm here whenever you need me. Let's get it! 💯`,
+
+            'supplement': `💊 <strong>Supplement Recommendations via IntercomSwap</strong>
+
+Based on your muscle-building goals, here's what I recommend:
+
+<div class="workout-card">
+<strong>1. Whey Protein Isolate</strong>
+• Best for: Post-workout recovery
+• Dose: 25-30g per serving
+• Price: ~$45 for 2 lbs
+<br><br>
+<strong>IntercomSwap Deal:</strong> Exchange your unused pre-workout for premium whey! Available marketplace swap.
+</div>
+
+<div class="workout-card">
+<strong>2. Creatine Monohydrate</strong>
+• Best for: Strength gains
+• Dose: 5g daily
+• Price: ~$20 for 3 months
+<br><br>
+Most researched supplement for muscle building. Proven results.
+</div>
+
+<div class="workout-card">
+<strong>3. Omega-3 Fish Oil</strong>
+• Best for: Recovery & inflammation
+• Dose: 2-3g daily
+• Price: ~$25/month
+</div>
+
+<strong>Priority Order:</strong>
+1️⃣ Whey protein (if you can't hit protein from food)
+2️⃣ Creatine (proven strength gains)
+3️⃣ Omega-3 (recovery support)
+
+<strong>Through IntercomSwap Marketplace:</strong>
+🔄 Swap unused supplements with community
+💰 Save 30-40% vs retail
+✅ Verified quality products
+🤝 Trade protein flavors you don't like
+
+Want me to set up a swap for you? 🛒`,
+
+            'default': `I'm here to help you crush your fitness goals! 💪
+
+You can ask me to:
+🏋️ <strong>Create Workouts</strong> - "Plan a leg day" or "Quick 20-min workout"
+🍽️ <strong>Meal Planning</strong> - "High protein lunch ideas" or "Pre-workout snack"
+📝 <strong>Log Activity</strong> - "Log: ran 5K in 30 min"
+📊 <strong>Track Progress</strong> - "Show my weekly progress"
+💪 <strong>Get Motivated</strong> - "I need motivation!"
+💊 <strong>Supplements</strong> - "What supplements should I take?"
+❓ <strong>Form Tips</strong> - "How to do a proper squat?"
+
+What would you like to work on today?`
+        };
+
+        function addMessage(content, type) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = content;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function sendQuickMessage(message) {
+            document.getElementById('userInput').value = message;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const message = input.value.trim().toLowerCase();
+
+            if (!input.value.trim()) return;
+
+            addMessage(input.value.trim(), 'user');
+            input.value = '';
+            sendBtn.disabled = true;
+
+            addMessage('<span class="loading"></span><span class="loading"></span><span class="loading"></span>', 'assistant');
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const messages = document.getElementById('messages');
+            messages.removeChild(messages.lastChild);
+
+            let response;
+            if (message.includes('workout') || message.includes('exercise') || message.includes('train')) {
+                response = responses.workout;
+            } else if (message.includes('meal') || message.includes('eat') || message.includes('food') || message.includes('lunch') || message.includes('dinner')) {
+                response = responses.meal;
+            } else if (message.includes('log') || message.includes('track') || message.includes('record')) {
+                response = responses.log;
+            } else if (message.includes('progress') || message.includes('stats') || message.includes('report')) {
+                response = responses.progress;
+            } else if (message.includes('motivat') || message.includes('inspire') || message.includes('encourage')) {
+                response = responses.motivation;
+            } else if (message.includes('supplement') || message.includes('protein') || message.includes('creatine')) {
+                response = responses.supplement;
+            } else {
+                response = responses.default;
+            }
+
+            addMessage(response, 'assistant');
+            sendBtn.disabled = false;
+            input.focus();
+        }
+
+        document.getElementById('userInput').focus();
+    </script>
+</body>
+</html>
